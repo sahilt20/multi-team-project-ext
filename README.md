@@ -2,15 +2,17 @@
 
 A professional Azure DevOps extension designed for **platform/DevOps teams** who serve multiple teams (Integration, BI, SRE, etc.). It provides a unified, cross-team sprint dashboard — ideal for **daily standups** — showing all sprints your team members are involved in, with rich work item details, filters, and metrics.
 
+> **Example:** Sahil works in the **Platform Engineering** team but serves Integration, BI, and SRE teams. Selecting "Platform Engineering" as the **Base Team** automatically identifies all platform members and shows their work items across every sprint — giving a single-pane-of-glass view for standup.
+
 ---
 
 ## 📸 Screenshots
 
-### Dashboard Overview
-![Dashboard showing summary bar, filters, and Platform Engineering sprint card](docs/dashboard-overview.png)
+### Dashboard with Base Team Selected
+![Dashboard showing Base Team selector with Platform Engineering selected, member chips, summary metrics, filters, and sprint card](docs/dashboard-overview.png)
 
-### Multi-Team Sprint Cards
-![Scrolled view showing Integration Team and BI Team sprint cards](docs/dashboard-scrolled.png)
+### Cross-Team Sprint Cards
+![Integration Team and BI Team sprint cards showing platform team members' work items](docs/dashboard-scrolled.png)
 
 ---
 
@@ -20,9 +22,18 @@ A professional Azure DevOps extension designed for **platform/DevOps teams** who
 - **Team count**, **Sprint count**, **Work Items**, **In Progress**, **Blocked**, **P1 Critical**, **Done %**
 - **Standup metrics**: Completed effort hours, remaining effort, capacity utilization %
 
+### 🏠 Base Team Selector (Key Feature)
+Select your **home team** (e.g., Platform Engineering) — the extension automatically:
+1. Identifies all members who have work items in that team's sprints
+2. Shows their avatar chips (e.g., 👤 Sahil Tanwar, 👤 Priya Sharma, 👤 Ravi Kumar)
+3. Filters all other teams' sprints to show **only your team members' work items**
+
+This is the core feature for platform teams — you see everywhere your people work.
+
 ### Comprehensive Filters
 | Filter | Description |
 |--------|-------------|
+| 🏠 **Base Team** | Select home team — auto-detects and filters by team members |
 | 🔍 **Text Search** | Search across title, ID, assigned person, and tags |
 | ⏱️ **Sprint Timeframe** | Toggle Past / Current / Future sprints |
 | 👤 **My Items** | Show only your assigned items |
@@ -129,6 +140,7 @@ This starts a Webpack dev server at **http://localhost:3000** with:
 - Hot module replacement (HMR)
 - Mock data for 4 teams (Platform, Integration, BI, SRE)
 - 30 realistic work items with priorities, tags, blocked states
+- **Platform Engineering** pre-selected as the base team
 
 ### 3. View in Browser
 

@@ -2,6 +2,7 @@ import { SprintInfo, TimeFrame } from "../services/dataService";
 import { getField } from "./helpers";
 
 export interface FilterState {
+  baseTeamId: string;          // Base team ID — "" means all
   selectedTeams: Set<string>;
   selectedMembers: Set<string>;
   timeframes: Set<TimeFrame>;
@@ -15,13 +16,14 @@ export interface FilterState {
 
 export function createDefaultFilter(): FilterState {
   return {
+    baseTeamId: "",
     selectedTeams: new Set(),
     selectedMembers: new Set(),
     timeframes: new Set(["current"]),
     workItemTypes: new Set(),
     states: new Set(),
     priorities: new Set(),
-    onlyMyItems: true,
+    onlyMyItems: false,
     searchText: "",
     showBlockedOnly: false,
   };
@@ -50,7 +52,6 @@ export function renderFilters(
       if (st) statesSet.add(st);
       if (p) prioritiesSet.add(String(p));
 
-      // Collect unique members
       const assigned = getField(wi, "System.AssignedTo");
       if (assigned) {
         const memberId = typeof assigned === "object" ? (assigned.id || assigned.uniqueName || "") : String(assigned);
@@ -62,6 +63,42 @@ export function renderFilters(
 
   const bar = document.createElement("div");
   bar.className = "filter-bar";
+
+  // ── Base Team selector (prominent, first) ─────────────────────────
+  const baseGroup = document.createElement("div");
+  baseGroup.className = "filter-group filter-group--base-team";
+  baseGroup.innerHTML = `<label class="filter-label">🏠 Base Team</label>`;
+  const baseSelect = document.createElement("select");
+  baseSelect.className = "base-team-select";
+  baseSelect.innerHTML = `<option value="">All Teams (no base)</option>`;
+  teamMap.forEach((name, id) => {
+    const opt = document.createElement("option");
+    opt.value = id;
+    opt.textContent = name;
+    if (id === filter.baseTeamId) opt.selected = true;
+    baseSelect.appendChild(opt);
+  });
+  baseSelect.addEventListener("change", () => {
+    filter.baseTeamId = baseSelect.value;
+    onChange();
+  });
+  baseGroup.appendChild(baseSelect);
+
+  // Show base team members when selected
+  if (filter.baseTeamId) {
+    const baseMembers = getBaseTeamMembers(sprints, filter.baseTeamId);
+    const memberNames = Array.from(baseMembers.values()).sort();
+    const memberChips = document.createElement("div");
+    memberChips.className = "base-team-members";
+    memberChips.innerHTML = `<span class="base-team-members__label">Team Members:</span> ` +
+      memberNames.map(n => {
+        const initials = n.split(" ").map(w => w[0]).join("").substring(0, 2).toUpperCase();
+        return `<span class="member-chip"><span class="member-chip__avatar">${initials}</span>${escapeHtml(n)}</span>`;
+      }).join(" ");
+    baseGroup.appendChild(memberChips);
+  }
+
+  bar.appendChild(baseGroup);
 
   // ── Text search ───────────────────────────────────────────────────
   const searchGroup = document.createElement("div");
@@ -198,7 +235,6 @@ function buildMultiSelect(
   const dropdown = document.createElement("div");
   dropdown.className = "dropdown-menu hidden";
 
-  // "All" option
   const allOpt = document.createElement("label");
   allOpt.className = "dropdown-option";
   const allCb = document.createElement("input");
@@ -256,6 +292,27 @@ function buildMultiSelect(
   return group;
 }
 
+// ── Base Team Member Resolution ─────────────────────────────────────
+
+/** Get all members who have work items in the base team's sprints */
+export function getBaseTeamMembers(
+  sprints: SprintInfo[],
+  baseTeamId: string
+): Map<string, string> {
+  const members = new Map<string, string>();
+  for (const s of sprints) {
+    if (s.team.id !== baseTeamId) continue;
+    for (const wi of s.workItems) {
+      const assigned = getField(wi, "System.AssignedTo");
+      if (!assigned) continue;
+      const id = typeof assigned === "object" ? (assigned.id || assigned.uniqueName || "") : String(assigned);
+      const name = typeof assigned === "object" ? (assigned.displayName || assigned.uniqueName || "Unknown") : String(assigned);
+      if (id) members.set(id, name);
+    }
+  }
+  return members;
+}
+
 /** Apply filters to the sprint data */
 export function applyFilters(
   sprints: SprintInfo[],
@@ -263,6 +320,13 @@ export function applyFilters(
   currentUserId: string
 ): SprintInfo[] {
   const searchLower = filter.searchText.toLowerCase().trim();
+
+  // If base team is selected, resolve its members
+  let baseTeamMemberIds: Set<string> | null = null;
+  if (filter.baseTeamId) {
+    const members = getBaseTeamMembers(sprints, filter.baseTeamId);
+    baseTeamMemberIds = new Set(members.keys());
+  }
 
   return sprints
     .filter((s) => {
@@ -272,6 +336,16 @@ export function applyFilters(
     })
     .map((s) => {
       let items = s.workItems;
+
+      // Base team filter: only show work items assigned to base team members
+      if (baseTeamMemberIds) {
+        items = items.filter((wi) => {
+          const assigned = getField(wi, "System.AssignedTo");
+          if (!assigned) return false;
+          const uid = typeof assigned === "object" ? (assigned.id || assigned.uniqueName) : String(assigned);
+          return baseTeamMemberIds!.has(uid);
+        });
+      }
 
       if (filter.workItemTypes.size > 0) {
         items = items.filter((wi) =>
@@ -332,4 +406,10 @@ export function applyFilters(
       return { ...s, workItems: items };
     })
     .filter((s) => s.workItems.length > 0);
+}
+
+function escapeHtml(str: string): string {
+  const div = document.createElement("div");
+  div.textContent = str;
+  return div.innerHTML;
 }

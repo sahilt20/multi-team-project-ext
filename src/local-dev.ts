@@ -27,8 +27,8 @@ class LocalDashboard {
     this.root = root;
     this.data = getMockData();
     this.filter = createDefaultFilter();
-    // In local mode, show all items (not just "my items") so we see full data
-    this.filter.onlyMyItems = false;
+    // Pre-select Platform Engineering as the base team for demo
+    this.filter.baseTeamId = "team-1";
   }
 
   render(): void {
