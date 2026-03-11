@@ -8,7 +8,7 @@
 
 import { getMockData } from "./services/mockData";
 import { CrossTeamData, SprintInfo, TimeFrame } from "./services/dataService";
-import { renderSummaryBar } from "./components/summaryBar";
+import { renderSummaryBar, initTheme } from "./components/summaryBar";
 import {
   renderFilters,
   createDefaultFilter,
@@ -79,6 +79,9 @@ document.addEventListener("DOMContentLoaded", () => {
   // Remove the loading screen
   const loading = document.getElementById("loading-screen");
   if (loading) loading.remove();
+
+  // Apply saved theme preference
+  initTheme();
 
   const dashboard = new LocalDashboard(root);
   dashboard.render();

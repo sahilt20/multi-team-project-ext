@@ -1,10 +1,14 @@
 import * as SDK from "azure-devops-extension-sdk";
 import { DataService } from "./services/dataService";
 import { Dashboard } from "./components/dashboard";
+import { initTheme } from "./components/summaryBar";
 import "./styles/main.css";
 
 // Wait for DOM to be ready
 document.addEventListener("DOMContentLoaded", () => {
+  // Apply saved theme preference before anything renders
+  initTheme();
+
   // Initialize the Azure DevOps Extension SDK
   SDK.init({ loaded: false });
 

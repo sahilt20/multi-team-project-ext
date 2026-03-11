@@ -55,6 +55,25 @@ export function renderSummaryBar(
     </div>
   `;
 
+  // Theme toggle button (top-right area)
+  const themeBtn = document.createElement("button");
+  themeBtn.className = "theme-toggle";
+  themeBtn.id = "theme-toggle";
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  themeBtn.innerHTML = `<span class="theme-toggle__icon">${isDark ? "☀️" : "🌙"}</span> ${isDark ? "Light" : "Dark"}`;
+  themeBtn.addEventListener("click", () => {
+    toggleTheme();
+    // Update button text
+    const nowDark = document.documentElement.getAttribute("data-theme") === "dark";
+    themeBtn.innerHTML = `<span class="theme-toggle__icon">${nowDark ? "☀️" : "🌙"}</span> ${nowDark ? "Light" : "Dark"}`;
+  });
+
+  // Insert toggle into greeting area
+  const greeting = bar.querySelector(".summary-greeting");
+  if (greeting) {
+    greeting.appendChild(themeBtn);
+  }
+
   // Standup metrics row
   const metricsRow = document.createElement("div");
   metricsRow.className = "standup-metrics";
@@ -75,6 +94,28 @@ export function renderSummaryBar(
   bar.appendChild(metricsRow);
 
   container.appendChild(bar);
+}
+
+/** Initialize theme from localStorage (call once on boot) */
+export function initTheme(): void {
+  const saved = localStorage.getItem("mtsv-theme") || "light";
+  if (saved === "dark") {
+    document.documentElement.setAttribute("data-theme", "dark");
+  } else {
+    document.documentElement.removeAttribute("data-theme");
+  }
+}
+
+/** Toggle between light and dark */
+function toggleTheme(): void {
+  const isDark = document.documentElement.getAttribute("data-theme") === "dark";
+  if (isDark) {
+    document.documentElement.removeAttribute("data-theme");
+    localStorage.setItem("mtsv-theme", "light");
+  } else {
+    document.documentElement.setAttribute("data-theme", "dark");
+    localStorage.setItem("mtsv-theme", "dark");
+  }
 }
 
 function escapeHtml(str: string): string {
