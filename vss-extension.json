@@ -1,0 +1,45 @@
+{
+  "manifestVersion": 1,
+  "id": "multi-team-sprint-view",
+  "publisher": "YourPublisherName",
+  "version": "1.0.0",
+  "name": "Multi-Team Sprint View",
+  "description": "A cross-team sprint dashboard that shows all sprints, work items, and dependencies across multiple teams in one unified view.",
+  "categories": ["Azure Boards"],
+  "targets": [
+    {
+      "id": "Microsoft.VisualStudio.Services"
+    }
+  ],
+  "icons": {
+    "default": "images/icon.png"
+  },
+  "content": {
+    "details": {
+      "path": "overview.md"
+    }
+  },
+  "scopes": ["vso.work"],
+  "contributions": [
+    {
+      "id": "multi-team-sprint-hub",
+      "type": "ms.vss-web.hub",
+      "targets": ["ms.vss-work-web.work-hub-group"],
+      "properties": {
+        "name": "Multi-Team Sprints",
+        "order": 99,
+        "uri": "dist/multi-team-sprint.html"
+      }
+    }
+  ],
+  "files": [
+    {
+      "path": "dist",
+      "addressable": true
+    },
+    {
+      "path": "images",
+      "addressable": true
+    }
+  ]
+}
