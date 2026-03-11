@@ -2,7 +2,7 @@
 
 A professional Azure DevOps extension designed for **platform/DevOps teams** who serve multiple teams (Integration, BI, SRE, etc.). It provides a unified, cross-team sprint dashboard — ideal for **daily standups** — showing all sprints your team members are involved in, with rich work item details, filters, and metrics.
 
-> **Example:** Sahil works in the **Platform Engineering** team but serves Integration, BI, and SRE teams. Selecting "Platform Engineering" as the **Base Team** automatically identifies all platform members and shows their work items across every sprint — giving a single-pane-of-glass view for standup.
+> **Example:** User X works in the **Platform Engineering** team but serves Integration, BI, and SRE teams. Selecting "Platform Engineering" as the **Base Team** automatically identifies all platform members and shows their work items across every sprint — giving a single-pane-of-glass view for standup.
 
 ---
 
@@ -25,7 +25,7 @@ A professional Azure DevOps extension designed for **platform/DevOps teams** who
 ### 🏠 Base Team Selector (Key Feature)
 Select your **home team** (e.g., Platform Engineering) — the extension automatically:
 1. Identifies all members who have work items in that team's sprints
-2. Shows their avatar chips (e.g., 👤 Sahil Tanwar, 👤 Priya Sharma, 👤 Ravi Kumar)
+2. Shows their avatar chips (e.g., 👤 User X, 👤 User Y, 👤 User Z)
 3. Filters all other teams' sprints to show **only your team members' work items**
 
 This is the core feature for platform teams — you see everywhere your people work.
