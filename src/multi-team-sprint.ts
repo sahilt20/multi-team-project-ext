@@ -3,35 +3,44 @@ import { DataService } from "./services/dataService";
 import { Dashboard } from "./components/dashboard";
 import "./styles/main.css";
 
-async function main(): Promise<void> {
+// Wait for DOM to be ready
+document.addEventListener("DOMContentLoaded", () => {
   // Initialize the Azure DevOps Extension SDK
-  await SDK.init({ loaded: false });
+  SDK.init({ loaded: false });
 
-  const root = document.getElementById("app");
-  if (!root) {
-    console.error("Multi-Team Sprint View: #app element not found");
-    return;
-  }
+  SDK.ready().then(async () => {
+    const root = document.getElementById("app");
+    if (!root) {
+      console.error("Multi-Team Sprint View: #app element not found");
+      SDK.notifyLoadSucceeded();
+      return;
+    }
 
-  try {
-    const dataService = new DataService();
-    await dataService.init();
+    // Remove loading screen
+    const loading = document.getElementById("loading-screen");
+    if (loading) loading.remove();
 
-    const dashboard = new Dashboard(root, dataService);
-    await dashboard.load();
-  } catch (err: any) {
-    console.error("Multi-Team Sprint View init error:", err);
-    root.innerHTML = `
-      <div class="error-screen">
-        <div class="error-icon">⚠️</div>
-        <h2 class="error-title">Extension Initialization Failed</h2>
-        <p class="error-message">${err.message || err}</p>
-      </div>
-    `;
-  }
+    try {
+      const dataService = new DataService();
+      await dataService.init();
 
-  // Notify the host that we're done loading
-  await SDK.notifyLoadSucceeded();
-}
+      const dashboard = new Dashboard(root, dataService);
+      await dashboard.load();
 
-main();
+      // Notify the host that we loaded successfully
+      SDK.notifyLoadSucceeded();
+    } catch (err: any) {
+      console.error("Multi-Team Sprint View init error:", err);
+      root.innerHTML = `
+        <div class="error-screen">
+          <div class="error-icon">⚠️</div>
+          <h2 class="error-title">Extension Initialization Failed</h2>
+          <p class="error-message">${err.message || err}</p>
+          <button class="retry-btn" onclick="window.location.reload()">Retry</button>
+        </div>
+      `;
+      // Still notify load succeeded so the host doesn't timeout
+      SDK.notifyLoadSucceeded();
+    }
+  });
+});

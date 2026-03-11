@@ -10,9 +10,18 @@ const config = {
     filename: isLocal ? "local-dev.js" : "multi-team-sprint.js",
     path: path.resolve(__dirname, "dist"),
     clean: true,
+    // Required for Azure DevOps extension iframe
+    devtoolNamespace: "multi-team-sprint-view",
   },
   resolve: {
     extensions: [".ts", ".js"],
+    // Force single copy of the SDK to prevent "already loaded" error
+    alias: {
+      "azure-devops-extension-sdk": path.resolve(
+        __dirname,
+        "node_modules/azure-devops-extension-sdk"
+      ),
+    },
   },
   module: {
     rules: [
@@ -39,7 +48,6 @@ const config = {
 };
 
 if (isLocal) {
-  // In local dev mode, use HtmlWebpackPlugin to auto-inject the bundle
   config.plugins.push(
     new HtmlWebpackPlugin({
       template: "./static/index.html",
